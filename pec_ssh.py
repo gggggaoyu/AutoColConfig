@@ -1,17 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import re
-from IPy import IP
-import json,sys
-import urllib2,requests
-import cookielib
-from urllib import urlencode
-import os
+
 import pexpect
 import getpass,os
-import traceback
 import logging
-#from pexpect.pty_spawn import spawn as sp
 from pexpect import spawn as sp
 
 def ssh_command(command):
