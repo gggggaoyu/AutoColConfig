@@ -48,16 +48,16 @@ def ssh_command(command):
 
     else:
         child.expect('.*[$#>]?')
-        child.sendline(command)
+        child.sendline(command +'| no-more')
         child.expect('.*[$#>]?' + command)
-        child.sendline('\n')
-        child.expect('Cisco IOS Software,.*?--More--')
+        child.sendline(command)
         return child
 
 if __name__ == '__main__':
     command_a = 'show version'
     command_b = 'show ip interface brief'
-    child = ssh_command(command_a)
+    command_c = 'show route'
+    child = ssh_command(command_c)
     #
     print child.before
     print 80*"{}"
