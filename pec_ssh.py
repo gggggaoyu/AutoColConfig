@@ -47,8 +47,9 @@ def ssh_command(command):
         child.sendline('JCFWnantian2014')
 
     else:
+        child.expect('(.*?)[$#>]')
         child.sendline(command)
-        child.expect('(.*?)[$#>]?')
+        # child.expect('(.*?)[$#>]?')
         return child
 
 if __name__ == '__main__':
