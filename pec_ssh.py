@@ -47,6 +47,7 @@ def ssh_command(command):
         child.sendline('JCFWnantian2014')
 
     else:
+        child.sendline(command)
         return child
 
 if __name__ == '__main__':
