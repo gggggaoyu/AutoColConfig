@@ -49,7 +49,7 @@ def ssh_command(command):
     else:
         child.expect('.*[$#>]?')
         child.sendline(command)
-        child.expect('.*[$#>]?' + command)
+        child.expect('.*[$#>]?' + command + '.*')
         return child
 
 if __name__ == '__main__':
@@ -60,3 +60,18 @@ if __name__ == '__main__':
     print child.before
     print 80*"{}"
     print child.after
+
+"""
+当 expect() 过程匹配到关键字（或者说正则表达式）之后，系统会自动给3个变量赋值，分别是 before, after 和 match
+
+process.before - 保存了到匹配到关键字为止，缓存里面已有的所有数据。也就是说如果缓存里缓存了 100 个字符的时候终于匹配到了关键字，那么 before 就是除了匹配到的关键字之外的所有字符
+process.after - 保存匹配到的关键字，比如你在 expect 里面使用了正则表达式，那么表达式匹配到的所有字符都在 after 里面
+process.match - 保存的是匹配到的正则表达式的实例，和上面的 after 相比一个是匹配到的字符串，一个是匹配到的正则表达式实例
+如果 expect() 过程中发生错误，那么 before 保存到目前位置缓存里的所有数据， after 和 match 都是 None
+
+作者：羽风之歌
+链接：http://www.jianshu.com/p/cfd163200d12
+來源：简书
+著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+
+"""
