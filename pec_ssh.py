@@ -31,7 +31,7 @@ def ssh_command(command):
         return None
 
     # 如果 ssh 没有 public key，接受它.
-    if i == 1:  # SSH does not have the public key. Just accept it.
+    elif i == 1:  # SSH does not have the public key. Just accept it.
         child.sendline('yes')
         p = child.expect([pexpect.TIMEOUT, 'password: '])
         if p == 0:  # Timeout
@@ -43,22 +43,20 @@ def ssh_command(command):
             child.sendline('JCFWnantian2014')
 
     # 输入密码.
-    if i == 2:
+    elif i == 2:
         child.sendline('JCFWnantian2014')
 
     else:
         child.expect('.*[$#>]?')
         child.sendline(command +'| no-more')
         child.expect('.*[$#>]?' + command)
-        child.sendline('')
         return child
 
 if __name__ == '__main__':
     command_a = 'show version'
     command_b = 'show ip interface brief'
-    command_c = 'show route'
-    child = ssh_command(command_c)
-    #
+    command_c = ''
+    child = ssh_command(command_a)
     print child.before
     print 80*"{}"
     print child.after
