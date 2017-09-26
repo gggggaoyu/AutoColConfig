@@ -53,7 +53,8 @@ def ssh_command(command):
 if __name__ == '__main__':
     command_a = 'show version'
     command_b = 'show ip interface brief'
-    child = ssh_command(command_b)
+    child = ssh_command(command_a)
+    #
     print child.before
     print 80*"{}"
     print child.after
