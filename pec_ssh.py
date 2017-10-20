@@ -2,9 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import pexpect
-import getpass,os
-import logging,re
 from pexpect import spawn as sp
+
 
 def ssh_command(command):
     account_name = 'cisco'
@@ -18,39 +17,75 @@ def ssh_command(command):
        """
     # 为 ssh 命令生成一个 spawn 类的子程序对象.
     child = sp('ssh -l %s %s' % (account_name, manage_ip), maxread=2000)
-    ssh_newkey = 'Are you sure you want to continue connecting'
-    Password = 'password: '
+    ssh_newkey = 'Are you sure you want to continue connecting ?'
+    Password = 'Password: '
     loginprompt = '.*?[$#>]'
-    i = child.expect([pexpect.TIMEOUT, ssh_newkey, Password,loginprompt])
+    index = child.expect([loginprompt,Password,ssh_newkey,pexpect.EOF,pexpect.TIMEOUT])
 
-    # 如果登录超时，打印出错信息，并退出.
-    if i == 0:  # Timeout
-        print 'TIMEOUT!'
-        print 'SSH could not login. Here is what SSH said:'
-        print child.before, child.after
-        return None
-
-    # 如果 ssh 没有 public key，接受它.
-    elif i == 1:  # SSH does not have the public key. Just accept it.
-        child.sendline('yes')
-        p = child.expect([pexpect.TIMEOUT, 'password: '])
-        if p == 0:  # Timeout
-            print 'TIMEOUT!'
-            return None
-            print 'SSH could not login. Here is what SSH said:'
-            print child.before, child.after
-        if p == 1:
-            child.sendline('JCFWnantian2014')
+    # 直接就登陆了,执行命令.
+    if index == 0:
+        print "many login so direct exec command!"
+        child.sendline(command)
+        DesiredContent = 'cisco.*'
+        i = child.expect([DesiredContent, pexpect.EOF, pexpect.TIMEOUT])
+        if i != 0:
+            print "match content failed!"
+            child.close(force=True)
+        return child
 
     # 输入密码.
-    elif i == 2:
-        child.sendline('JCFWnantian2014')
+    elif index == 1:
+        child.sendline('JCFWnantian2014')  # 如果登录超时，打印出错信息，并退出.
+        i = child.expect([loginprompt, pexpect.EOF, pexpect.TIMEOUT])
+        if i != 0:
+            print "ssh login failed ,password is worng!"
+            child.close(force=True)
 
-    else:
-        child.expect('.*[$#>]?')
-        child.sendline(command +'| no-more')
-        child.expect('.*[$#>]?' + command)
+        child.sendline(command)
+        DesiredContent = 'cisco.*'
+        i = child.expect([DesiredContent, pexpect.EOF, pexpect.TIMEOUT])
+        if i != 0:
+            print "match content failed!"
+            child.close(force=True)
         return child
+
+    # 如果 ssh 没有 public key，接受它.
+    elif index == 2:  # SSH does not have the public key. Just accept it.
+        child.sendline('yes')
+        i = child.expect([Password, pexpect.EOF, pexpect.TIMEOUT])
+        if i!= 0:
+            print "ssh login failed , can't match Password!"
+            child.close(force=True)
+
+        child.sendline('JCFWnantian2014')  # 如果登录超时，打印出错信息，并退出.
+        i = child.expect([loginprompt, pexpect.EOF, pexpect.TIMEOUT])
+        if i != 0:
+            print "ssh login failed ,password is worng!"
+            child.close(force=True)
+
+        child.sendline(command)
+        DesiredContent = 'cisco.*'
+        i = child.expect([DesiredContent, pexpect.EOF, pexpect.TIMEOUT])
+        if i != 0:
+            print "match content failed!"
+            child.close(force=True)
+        return child
+
+
+    elif index == 3:
+        print 'pexpect.EOF！'
+        print 'SSH could not login. Here is what SSH said:`'
+        return child
+
+    else:# Timeout
+        print 'TIMEOUT!'
+        print 'SSH could not login. Here is what SSH said:`'
+        return child
+
+        # child.expect('.*[$#>]?')
+        # child.sendline(command +'| no-more')
+        # child.expect('.*[$#>]?' + command)
+        # child.expect('.*?')
 
 if __name__ == '__main__':
     command_a = 'show version'
