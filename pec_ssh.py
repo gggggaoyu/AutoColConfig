@@ -26,11 +26,11 @@ def ssh_command(command):
     if index == 0:
         print "many login so direct exec command!"
         child.sendline(command)
-        DesiredContent = command
-        i = child.expect([DesiredContent,pexpect.EOF,pexpect.TIMEOUT])
-        if i != 0:
-            print "match content failed!"
-            child.close(force=True)
+        # DesiredContent = command
+        # i = child.expect([DesiredContent,pexpect.EOF,pexpect.TIMEOUT])
+        # if i != 0:
+        #     print "match content failed!"
+        #     child.close(force=True)
         return child
 
     # 输入密码.
